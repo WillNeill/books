@@ -25,12 +25,6 @@ export interface VersionParts {
   beta?: number;
 }
 
-export type Creds = {
-  errorLogUrl: string;
-  telemetryUrl: string;
-  tokenString: string;
-};
-
 export type UnexpectedLogObject = {
   name: string;
   message: string;

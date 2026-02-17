@@ -20,8 +20,11 @@ import fetch from 'node-fetch';
 
 const VALENTINES_DAY = 1644796800000;
 
-export async function getLanguageMap(code: string): Promise<LanguageMap> {
-  const contents = await getContents(code);
+export async function getLanguageMap(
+  code: string,
+  allowNetwork = true
+): Promise<LanguageMap> {
+  const contents = await getContents(code, allowNetwork);
   return getMapFromCsv(contents);
 }
 
@@ -50,11 +53,11 @@ function getMapFromCsv(csv: string): LanguageMap {
   return languageMap;
 }
 
-async function getContents(code: string) {
+async function getContents(code: string, allowNetwork: boolean) {
   let contents = await getContentsIfExists(code);
-  if (contents.length === 0) {
+  if (contents.length === 0 && allowNetwork) {
     contents = (await fetchAndStoreFile(code)) || contents;
-  } else {
+  } else if (contents.length > 0 && allowNetwork) {
     contents = (await getUpdatedContent(code, contents)) || contents;
   }
 

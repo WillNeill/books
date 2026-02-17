@@ -12,7 +12,6 @@ import type { BackendResponse } from 'utils/ipc/types';
 import { IPC_ACTIONS, IPC_CHANNELS, IPC_MESSAGES } from 'utils/messages';
 import type {
   ConfigFilesWithModified,
-  Creds,
   LanguageMap,
   SelectFileOptions,
   SelectFileReturn,
@@ -63,12 +62,12 @@ const ipc = {
     return ipcRenderer.send(IPC_MESSAGES.CLOSE_MAIN_WINDOW);
   },
 
-  async getCreds() {
-    return (await ipcRenderer.invoke(IPC_ACTIONS.GET_CREDS)) as Creds;
-  },
-
-  async getLanguageMap(code: string) {
-    return (await ipcRenderer.invoke(IPC_ACTIONS.GET_LANGUAGE_MAP, code)) as {
+  async getLanguageMap(code: string, allowNetwork = true) {
+    return (await ipcRenderer.invoke(
+      IPC_ACTIONS.GET_LANGUAGE_MAP,
+      code,
+      allowNetwork
+    )) as {
       languageMap: LanguageMap;
       success: boolean;
       message: string;
@@ -192,10 +191,6 @@ const ipc = {
 
   async showError(title: string, content: string) {
     await ipcRenderer.invoke(IPC_ACTIONS.SHOW_ERROR, { title, content });
-  },
-
-  async sendError(body: string) {
-    await ipcRenderer.invoke(IPC_ACTIONS.SEND_ERROR, body);
   },
 
   async sendAPIRequest(endpoint: string, options: RequestInit | undefined) {

@@ -22,6 +22,11 @@ export default () => {
     server: { host, port, strictPort: true },
     root: path.resolve(__dirname, './src'),
     plugins: [vue()],
+    define: {
+      '__SENTRY_DSN__': JSON.stringify(process.env.SENTRY_DSN ?? ''),
+      '__POSTHOG_KEY__': JSON.stringify(process.env.POSTHOG_KEY ?? ''),
+      '__POSTHOG_HOST__': JSON.stringify(process.env.POSTHOG_HOST ?? ''),
+    },
     resolve: {
       alias: {
         vue: 'vue/dist/vue.runtime.esm-bundler.js',

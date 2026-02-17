@@ -1,5 +1,4 @@
 // App is tagged with a .mjs extension to allow
-import { existsSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -21,11 +20,6 @@ const frappeBooksConfig = {
   artifactName: '${productName}-v${version}-${os}-${arch}.${ext}',
   asarUnpack: '**/*.node',
   extraResources: [
-    // log_creds.txt is created from GitHub secrets during CI/CD publishing
-    // (see .github/workflows/publish.yml). Skip locally to avoid warnings.
-    ...(existsSync('log_creds.txt')
-      ? [{ from: 'log_creds.txt', to: '../creds/log_creds.txt' }]
-      : []),
     { from: 'translations', to: '../translations' },
     { from: 'templates', to: '../templates' },
   ],

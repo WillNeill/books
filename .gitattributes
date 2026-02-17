@@ -1,0 +1,27 @@
+# Fork-divergent files: always keep ours on merge from upstream
+# These files have been modified to replace Frappe mothership telemetry/error
+# logging with Sentry + PostHog, and to add privacy opt-out toggles.
+main/contactMothership.ts merge=ours
+main/registerIpcMainActionListeners.ts merge=ours
+main/preload.ts merge=ours
+main/getLanguageMap.ts merge=ours
+main.ts merge=ours
+src/errorHandling.ts merge=ours
+src/renderer.ts merge=ours
+src/utils/language.ts merge=ours
+src/App.vue merge=ours
+fyo/telemetry/telemetry.ts merge=ours
+fyo/telemetry/types.ts merge=ours
+fyo/core/authHandler.ts merge=ours
+fyo/demux/auth.ts merge=ours
+fyo/tests/helpers.ts merge=ours
+utils/messages.ts merge=ours
+utils/types.ts merge=ours
+utils/auth/types.ts merge=ours
+schemas/core/SystemSettings.json merge=ours
+electron-builder-config.mjs merge=ours
+.env.publish merge=ours
+build/scripts/helpers.mjs merge=ours
+build/scripts/build.mjs merge=ours
+vite.config.ts merge=ours
+.github/workflows/publish.yml merge=ours

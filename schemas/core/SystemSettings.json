@@ -148,6 +148,38 @@
       "fieldtype": "Check",
       "default": false,
       "section": "Customizations"
+    },
+    {
+      "fieldname": "enableErrorReporting",
+      "label": "Enable Error Reporting",
+      "fieldtype": "Check",
+      "default": true,
+      "description": "Send anonymous crash reports to help improve the app. No financial data is included.",
+      "section": "Privacy"
+    },
+    {
+      "fieldname": "enableTelemetry",
+      "label": "Enable Usage Analytics",
+      "fieldtype": "Check",
+      "default": true,
+      "description": "Send anonymous usage events to help prioritise development.",
+      "section": "Privacy"
+    },
+    {
+      "fieldname": "enableAutoUpdateCheck",
+      "label": "Check for Updates Automatically",
+      "fieldtype": "Check",
+      "default": true,
+      "description": "Periodically check GitHub for new versions of the app.",
+      "section": "Privacy"
+    },
+    {
+      "fieldname": "enableTranslationUpdates",
+      "label": "Update Translations Automatically",
+      "fieldtype": "Check",
+      "default": true,
+      "description": "Fetch updated translation files from GitHub when a language is loaded.",
+      "section": "Privacy"
     }
   ],
   "quickEditFields": [

@@ -22,6 +22,9 @@ export function getMainProcessCommonConfig(root) {
     external: ['knex', 'electron', 'better-sqlite3', 'electron-store'],
     plugins: [excludeVendorFromSourceMap],
     write: true,
+    define: {
+      '__SENTRY_DSN__': JSON.stringify(process.env.SENTRY_DSN ?? ''),
+    },
   };
 }
 

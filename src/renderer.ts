@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/electron/renderer';
 import { CUSTOM_EVENTS } from 'utils/messages';
 import { UnexpectedLogObject } from 'utils/types';
 import { App as VueApp, createApp } from 'vue';
@@ -27,6 +28,10 @@ import { setLanguageMap } from './utils/language';
   fyo.store.appVersion = version;
   fyo.store.platform = platform;
   const platformName = getPlatformName(platform);
+
+  if (!isDevelopment) {
+    Sentry.init();
+  }
 
   setOnWindow(isDevelopment);
 

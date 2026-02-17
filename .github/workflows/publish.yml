@@ -19,18 +19,6 @@ jobs:
           yarn set version 1.22.18
           yarn
 
-      - name: Set Error Log Creds
-        env:
-          ERR_LOG_KEY: ${{ secrets.ERR_LOG_KEY }}
-          ERR_LOG_URL: ${{ secrets.ERR_LOG_URL }}
-          ERR_LOG_SECRET: ${{ secrets.ERR_LOG_SECRET }}
-          TELEMETRY_URL: ${{ secrets.TELEMETRY_URL }}
-        run: |
-          echo $ERR_LOG_KEY > log_creds.txt
-          echo $ERR_LOG_SECRET >> log_creds.txt
-          echo $ERR_LOG_URL >> log_creds.txt
-          echo $TELEMETRY_URL >> log_creds.txt
-
       - name: Run build
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
@@ -40,6 +28,9 @@ jobs:
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
           CSC_IDENTITY_AUTO_DISCOVERY: true
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          POSTHOG_KEY: ${{ secrets.POSTHOG_KEY }}
+          POSTHOG_HOST: ${{ secrets.POSTHOG_HOST }}
         run: |
           yarn set version 1.22.18
           yarn build --mac --publish always
@@ -69,18 +60,6 @@ jobs:
           yarn set version 1.22.18
           yarn
 
-      - name: Set Error Log Creds
-        env:
-          ERR_LOG_KEY: ${{ secrets.ERR_LOG_KEY }}
-          ERR_LOG_URL: ${{ secrets.ERR_LOG_URL }}
-          ERR_LOG_SECRET: ${{ secrets.ERR_LOG_SECRET }}
-          TELEMETRY_URL: ${{ secrets.TELEMETRY_URL }}
-        run: |
-          echo $ERR_LOG_KEY > log_creds.txt
-          echo $ERR_LOG_SECRET >> log_creds.txt
-          echo $ERR_LOG_URL >> log_creds.txt
-          echo $TELEMETRY_URL >> log_creds.txt
-
       - name: Run build
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
@@ -90,6 +69,9 @@ jobs:
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
           CSC_IDENTITY_AUTO_DISCOVERY: true
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          POSTHOG_KEY: ${{ secrets.POSTHOG_KEY }}
+          POSTHOG_HOST: ${{ secrets.POSTHOG_HOST }}
         run: |
           yarn set version 1.22.18
           yarn build --mac --publish always
@@ -119,21 +101,12 @@ jobs:
           yarn set version 1.22.18
           yarn
 
-      - name: Set Error Log Creds
-        env:
-          ERR_LOG_KEY: ${{ secrets.ERR_LOG_KEY }}
-          ERR_LOG_URL: ${{ secrets.ERR_LOG_URL }}
-          ERR_LOG_SECRET: ${{ secrets.ERR_LOG_SECRET }}
-          TELEMETRY_URL: ${{ secrets.TELEMETRY_URL }}
-        run: |
-          echo $ERR_LOG_KEY > log_creds.txt
-          echo $ERR_LOG_SECRET >> log_creds.txt
-          echo $ERR_LOG_URL >> log_creds.txt
-          echo $TELEMETRY_URL >> log_creds.txt
-
       - name: Run build
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          POSTHOG_KEY: ${{ secrets.POSTHOG_KEY }}
+          POSTHOG_HOST: ${{ secrets.POSTHOG_HOST }}
         run: |
           yarn set version 1.22.18
           yarn build --linux --publish always
@@ -165,23 +138,14 @@ jobs:
       - name: Install Dependencies
         run: yarn
 
-      - name: Set Error Log Creds
-        env:
-          ERR_LOG_KEY: ${{ secrets.ERR_LOG_KEY }}
-          ERR_LOG_URL: ${{ secrets.ERR_LOG_URL }}
-          ERR_LOG_SECRET: ${{ secrets.ERR_LOG_SECRET }}
-          TELEMETRY_URL: ${{ secrets.TELEMETRY_URL }}
-        run: |
-          echo $ERR_LOG_KEY > log_creds.txt
-          echo $ERR_LOG_SECRET >> log_creds.txt
-          echo $ERR_LOG_URL >> log_creds.txt
-          echo $TELEMETRY_URL >> log_creds.txt
-
       - name: Run build
         env:
           WIN_CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
           WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          POSTHOG_KEY: ${{ secrets.POSTHOG_KEY }}
+          POSTHOG_HOST: ${{ secrets.POSTHOG_HOST }}
         run: yarn build --win --publish always
 
       - name: Tar files

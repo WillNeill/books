@@ -25,6 +25,14 @@ jobs:
       - name: Checkout Books
         uses: actions/checkout@v4
 
+      - name: Setup Python for node-gyp
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install setuptools for Python 3.12+
+        run: python -m pip install setuptools
+
       - name: Install Dependencies
         run: yarn
 

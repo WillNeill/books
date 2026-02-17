@@ -22,4 +22,6 @@ schemas/core/SystemSettings.json merge=ours
 electron-builder-config.mjs merge=ours
 .env.publish merge=ours
 build/scripts/helpers.mjs merge=ours
+build/scripts/build.mjs merge=ours
 vite.config.ts merge=ours
+.github/workflows/publish.yml merge=ours

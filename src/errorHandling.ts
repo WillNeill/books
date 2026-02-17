@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/electron/renderer';
 import { t } from 'fyo';
 import type { Doc } from 'fyo/model/doc';
 import { BaseError } from 'fyo/utils/errors';
@@ -6,7 +7,7 @@ import { truncate } from 'lodash';
 import { showDialog } from 'src/utils/interactive';
 import { fyo } from './initFyo';
 import router from './router';
-import { getErrorMessage, stringifyCircular } from './utils';
+import { getErrorMessage } from './utils';
 import type { DialogOptions, ToastOptions } from './utils/types';
 import { ModelNameEnum } from 'models/types';
 
@@ -15,34 +16,34 @@ function shouldNotStore(error: Error) {
   return !shouldLog;
 }
 
-export async function sendError(errorLogObj: ErrorLog) {
+export function sendError(errorLogObj: ErrorLog) {
   if (!errorLogObj.stack) {
     return;
   }
 
-  errorLogObj.more ??= {};
-  errorLogObj.more.path ??= router.currentRoute.value.fullPath;
-
-  const body = {
-    error_name: errorLogObj.name,
-    message: errorLogObj.message,
-    stack: errorLogObj.stack,
-    platform: fyo.store.platform,
-    version: fyo.store.appVersion,
-    language: fyo.store.language,
-    instance_id: fyo.store.instanceId,
-    device_id: fyo.store.deviceId,
-    open_count: fyo.store.openCount,
-    country_code: fyo.singles.SystemSettings?.countryCode,
-    more: stringifyCircular(errorLogObj.more),
-  };
-
   if (fyo.store.isDevelopment) {
     // eslint-disable-next-line no-console
-    console.log('sendError', body);
+    console.log('sendError', errorLogObj);
+    return;
   }
 
-  await ipc.sendError(JSON.stringify(body));
+  if (!fyo.singles.SystemSettings?.enableErrorReporting) {
+    return;
+  }
+
+  const error = new Error(errorLogObj.message);
+  error.name = errorLogObj.name ?? 'Error';
+  error.stack = errorLogObj.stack;
+
+  Sentry.captureException(error, {
+    extra: {
+      platform: fyo.store.platform,
+      version: fyo.store.appVersion,
+      language: fyo.store.language,
+      country_code: fyo.singles.SystemSettings?.countryCode,
+      path: router.currentRoute.value.fullPath,
+    },
+  });
 }
 
 function getToastProps(errorLogObj: ErrorLog) {
@@ -88,7 +89,7 @@ export async function handleError(
   }
 
   const errorLogObj = getErrorLogObject(error, more);
-  await sendError(errorLogObj);
+  sendError(errorLogObj);
 
   if (notifyUser) {
     const toastProps = getToastProps(errorLogObj);

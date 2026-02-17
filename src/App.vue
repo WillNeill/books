@@ -167,7 +167,9 @@ export default defineComponent({
       this.activeScreen = Screen.Desk;
       await this.setDeskRoute();
       await fyo.telemetry.start(true);
-      await ipc.checkForUpdates();
+      if (fyo.singles.SystemSettings?.enableAutoUpdateCheck) {
+        await ipc.checkForUpdates();
+      }
       this.dbPath = filePath;
       this.companyName = (await fyo.getValue(
         ModelNameEnum.AccountingSettings,

@@ -71,7 +71,12 @@ function getLanguageCode(initLanguage: string, oldLanguage: string) {
 }
 
 async function fetchAndSetLanguageMap(code: string) {
-  const { success, message, languageMap } = await ipc.getLanguageMap(code);
+  const allowNetwork =
+    fyo.singles.SystemSettings?.enableTranslationUpdates ?? true;
+  const { success, message, languageMap } = await ipc.getLanguageMap(
+    code,
+    allowNetwork
+  );
 
   if (!success) {
     const { showToast } = await import('src/utils/interactive');

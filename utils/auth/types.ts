@@ -1,5 +1,1 @@
-import { Creds } from 'utils/types';
-
-export abstract class AuthDemuxBase {
-  abstract getCreds(): Promise<Creds>;
-}
+export abstract class AuthDemuxBase {}

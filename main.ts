@@ -5,6 +5,7 @@ require('source-map-support').install({
 });
 
 import { emitMainProcessError } from 'backend/helpers';
+import { initSentryMain } from './main/sentry';
 import {
   app,
   BrowserWindow,
@@ -34,6 +35,7 @@ export class Main {
   HEIGHT = process.platform === 'win32' ? 826 : 800;
 
   constructor() {
+    initSentryMain();
     this.icon = this.isDevelopment
       ? path.resolve('./build/icon.png')
       : path.join(__dirname, 'icons', '512x512.png');

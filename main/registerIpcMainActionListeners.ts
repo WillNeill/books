@@ -16,7 +16,6 @@ import { emitMainProcessError } from '../backend/helpers';
 import { Main } from '../main';
 import { DatabaseMethod } from '../utils/db/types';
 import { IPC_ACTIONS } from '../utils/messages';
-import { getUrlAndTokenString, sendError } from './contactMothership';
 import { getLanguageMap } from './getLanguageMap';
 import { getTemplates } from './getPrintTemplates';
 import { printHtmlDocument } from './printHtmlDocument';
@@ -147,10 +146,6 @@ export default function registerIpcMainActionListeners(main: Main) {
     }
   );
 
-  ipcMain.handle(IPC_ACTIONS.SEND_ERROR, async (_, bodyJson: string) => {
-    await sendError(bodyJson, main);
-  });
-
   ipcMain.handle(IPC_ACTIONS.CHECK_FOR_UPDATES, async () => {
     if (main.isDevelopment || main.checkedForUpdate) {
       return;
@@ -168,17 +163,20 @@ export default function registerIpcMainActionListeners(main: Main) {
     main.checkedForUpdate = true;
   });
 
-  ipcMain.handle(IPC_ACTIONS.GET_LANGUAGE_MAP, async (_, code: string) => {
-    const obj = { languageMap: {}, success: true, message: '' };
-    try {
-      obj.languageMap = await getLanguageMap(code);
-    } catch (err) {
-      obj.success = false;
-      obj.message = (err as Error).message;
-    }
+  ipcMain.handle(
+    IPC_ACTIONS.GET_LANGUAGE_MAP,
+    async (_, code: string, allowNetwork = true) => {
+      const obj = { languageMap: {}, success: true, message: '' };
+      try {
+        obj.languageMap = await getLanguageMap(code, allowNetwork);
+      } catch (err) {
+        obj.success = false;
+        obj.message = (err as Error).message;
+      }
 
-    return obj;
-  });
+      return obj;
+    }
+  );
 
   ipcMain.handle(
     IPC_ACTIONS.SELECT_FILE,
@@ -212,10 +210,6 @@ export default function registerIpcMainActionListeners(main: Main) {
       return response;
     }
   );
-
-  ipcMain.handle(IPC_ACTIONS.GET_CREDS, () => {
-    return getUrlAndTokenString();
-  });
 
   ipcMain.handle(IPC_ACTIONS.DELETE_FILE, async (_, filePath: string) => {
     return getErrorHandledReponse(async () => await fs.unlink(filePath));

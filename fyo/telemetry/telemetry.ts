@@ -1,31 +1,9 @@
 import { Fyo } from 'fyo';
-import { Noun, Telemetry, Verb } from './types';
+import { Noun, Verb } from './types';
 import { ModelNameEnum } from 'models/types';
 
-/**
- * # Telemetry
- * Used to check if people are using Books or not. All logging
- * happens using navigator.sendBeacon
- *
- * ## `start`
- * Used to initialize state. It should be called before any logging and after an
- * instance has loaded.
- * It is called on three events:
- * 1. When Desk is opened, i.e. when the usage starts, this also sends a
- *      Opened instance log.
- * 2. On visibility change if not started, eg: when user minimizes Books and
- *      then comes back later.
- * 3. When `log` is called, but telemetry isn't initialized.
- *
- * ## `log`
- * Used to log activity.
- *
- * ## `stop`
- * This is to be called when a session is being stopped. It's called on two events
- * 1. When the db is being changed.
- * 2. When the visiblity has changed which happens when either the app is being shut or
- *      the app is hidden.
- */
+declare const __POSTHOG_KEY__: string;
+declare const __POSTHOG_HOST__: string;
 
 const ignoreList: string[] = [
   ModelNameEnum.AccountingLedgerEntry,
@@ -33,17 +11,12 @@ const ignoreList: string[] = [
 ];
 
 export class TelemetryManager {
-  #url = '';
-  #token = '';
   #started = false;
+  #posthog: typeof import('posthog-js').default | null = null;
   fyo: Fyo;
 
   constructor(fyo: Fyo) {
     this.fyo = fyo;
-  }
-
-  get hasCreds() {
-    return !!this.#url && !!this.#token;
   }
 
   get started() {
@@ -52,7 +25,7 @@ export class TelemetryManager {
 
   async start(isOpened?: boolean) {
     this.#started = true;
-    await this.#setCreds();
+    await this.#initPostHog();
 
     if (isOpened) {
       this.log(Verb.Opened, 'instance');
@@ -68,70 +41,73 @@ export class TelemetryManager {
 
     this.log(Verb.Closed, 'instance');
     this.#started = false;
+    this.#posthog?.reset();
   }
 
   log(verb: Verb, noun: Noun, more?: Record<string, unknown>) {
     if (!this.#started && this.fyo.db.isConnected) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      this.start().then(() => this.#sendBeacon(verb, noun, more));
+      this.start().then(() => this.#capture(verb, noun, more));
       return;
     }
 
-    this.#sendBeacon(verb, noun, more);
+    this.#capture(verb, noun, more);
   }
 
   async logOpened() {
-    await this.#setCreds();
-    this.#sendBeacon(Verb.Opened, 'app');
+    await this.#initPostHog();
+    this.#capture(Verb.Opened, 'app');
   }
 
-  #sendBeacon(verb: Verb, noun: Noun, more?: Record<string, unknown>) {
+  #capture(verb: Verb, noun: Noun, more?: Record<string, unknown>) {
     if (
-      !this.hasCreds ||
+      !this.#posthog ||
       this.fyo.store.skipTelemetryLogging ||
       ignoreList.includes(noun)
     ) {
       return;
     }
 
-    const telemetryData: Telemetry = this.#getTelemtryData(verb, noun, more);
-    const data = JSON.stringify({
-      token: this.#token,
-      telemetryData,
-    });
-
-    navigator.sendBeacon(this.#url, data);
-  }
-
-  async #setCreds() {
-    if (this.hasCreds) {
+    if (!this.fyo.singles.SystemSettings?.enableTelemetry) {
       return;
     }
 
-    const { telemetryUrl, tokenString } = await this.fyo.auth.getCreds();
-    this.#url = telemetryUrl;
-    this.#token = tokenString;
+    this.#posthog.capture(verb, { noun, ...more });
   }
 
-  #getTelemtryData(
-    verb: Verb,
-    noun: Noun,
-    more?: Record<string, unknown>
-  ): Telemetry {
-    const countryCode = this.fyo.singles.SystemSettings?.countryCode;
-    return {
-      country: countryCode ?? '',
-      language: this.fyo.store.language,
-      deviceId:
-        this.fyo.store.deviceId || (this.fyo.config.get('deviceId') ?? '-'),
-      instanceId: this.fyo.store.instanceId,
-      version: this.fyo.store.appVersion,
-      openCount: this.fyo.store.openCount,
-      timestamp: new Date().toISOString().replace('T', ' ').slice(0, -1),
-      platform: this.fyo.store.platform,
-      verb,
-      noun,
-      more,
-    };
+  async #initPostHog() {
+    if (this.#posthog) {
+      return;
+    }
+
+    const key =
+      typeof __POSTHOG_KEY__ !== 'undefined' ? __POSTHOG_KEY__ : '';
+    const host =
+      typeof __POSTHOG_HOST__ !== 'undefined' ? __POSTHOG_HOST__ : '';
+    if (!key || !host) {
+      return;
+    }
+
+    const { default: posthog } = await import('posthog-js');
+    posthog.init(key, {
+      api_host: host,
+      autocapture: false,
+      capture_pageview: false,
+      disable_session_recording: true,
+      persistence: 'localStorage',
+    });
+
+    const deviceId =
+      this.fyo.store.deviceId || (this.fyo.config.get('deviceId') ?? '');
+    if (deviceId) {
+      posthog.identify(String(deviceId), {
+        platform: this.fyo.store.platform,
+        country: this.fyo.singles.SystemSettings?.countryCode ?? '',
+        language: this.fyo.store.language,
+        version: this.fyo.store.appVersion,
+      });
+    }
+
+    this.#posthog = posthog;
   }
 }

@@ -20,7 +20,7 @@ fi
 source "$REPO_ROOT/.env.publish"
 
 # Validate Apple signing env vars (GH_TOKEN not required for local builds)
-for var in APPLE_ID APPLE_TEAM_ID APPLE_APP_SPECIFIC_PASSWORD; do
+for var in APPLE_ID APPLE_TEAM_ID APPLE_APP_SPECIFIC_PASSWORD CSC_NAME; do
   if [ -z "${(P)var}" ]; then
     echo "Required env var $var is not set in .env.publish"
     exit 1
@@ -28,7 +28,7 @@ for var in APPLE_ID APPLE_TEAM_ID APPLE_APP_SPECIFIC_PASSWORD; do
 done
 
 # Export env vars for electron-builder and the build script
-export CSC_IDENTITY_AUTO_DISCOVERY=true
+export CSC_NAME
 export APPLE_ID
 export APPLE_TEAM_ID
 export APPLE_APP_SPECIFIC_PASSWORD

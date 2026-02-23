@@ -21,7 +21,7 @@ fi
 source "$REPO_ROOT/.env.publish"
 
 # Validate all required env vars (including GH_TOKEN for upload)
-for var in GH_TOKEN APPLE_ID APPLE_TEAM_ID APPLE_APP_SPECIFIC_PASSWORD; do
+for var in GH_TOKEN APPLE_ID APPLE_TEAM_ID APPLE_APP_SPECIFIC_PASSWORD CSC_NAME; do
   if [ -z "${(P)var}" ]; then
     echo "Required env var $var is not set in .env.publish"
     exit 1
@@ -53,7 +53,7 @@ yarn install
 
 # Export env vars for electron-builder and the build script
 export GH_TOKEN
-export CSC_IDENTITY_AUTO_DISCOVERY=true
+export CSC_NAME
 export APPLE_ID
 export APPLE_TEAM_ID
 export APPLE_APP_SPECIFIC_PASSWORD

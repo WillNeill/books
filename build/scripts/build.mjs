@@ -78,8 +78,10 @@ async function buildRendererProcessSource() {
         onwarn(warning, warn) {
           // Suppress mixed static/dynamic import warnings — these are
           // intentional patterns to avoid circular deps at module init time
-          if (warning.code === 'PLUGIN_WARNING' &&
-              warning.message?.includes('dynamic import will not move')) {
+          if (
+            warning.code === 'PLUGIN_WARNING' &&
+            warning.message?.includes('dynamic import will not move')
+          ) {
             return;
           }
           warn(warning);
@@ -112,9 +114,9 @@ async function buildRendererProcessSource() {
     },
     plugins: [vue()],
     define: {
-      '__SENTRY_DSN__': JSON.stringify(process.env.SENTRY_DSN ?? ''),
-      '__POSTHOG_KEY__': JSON.stringify(process.env.POSTHOG_KEY ?? ''),
-      '__POSTHOG_HOST__': JSON.stringify(process.env.POSTHOG_HOST ?? ''),
+      __SENTRY_DSN__: JSON.stringify(process.env.SENTRY_DSN ?? ''),
+      __POSTHOG_KEY__: JSON.stringify(process.env.POSTHOG_KEY ?? ''),
+      __POSTHOG_HOST__: JSON.stringify(process.env.POSTHOG_HOST ?? ''),
     },
     resolve: {
       alias: {

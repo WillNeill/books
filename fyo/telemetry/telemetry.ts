@@ -80,8 +80,7 @@ export class TelemetryManager {
       return;
     }
 
-    const key =
-      typeof __POSTHOG_KEY__ !== 'undefined' ? __POSTHOG_KEY__ : '';
+    const key = typeof __POSTHOG_KEY__ !== 'undefined' ? __POSTHOG_KEY__ : '';
     const host =
       typeof __POSTHOG_HOST__ !== 'undefined' ? __POSTHOG_HOST__ : '';
     if (!key || !host) {

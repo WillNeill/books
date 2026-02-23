@@ -1,6 +1,6 @@
 {
   "name": "frappe-books",
-  "version": "0.36.0",
+  "version": "0.37.0",
   "description": "Simple book-keeping app for everyone",
   "author": {
     "name": "Frappe Technologies Pvt. Ltd.",
@@ -9,7 +9,8 @@
   "scripts": {
     "dev": "node build/scripts/dev.mjs",
     "build": "node build/scripts/build.mjs",
-    "release": "scripts/publish-mac-arm.sh",
+    "release:local": "scripts/publish-local.sh",
+    "release:github": "scripts/publish-github.sh",
     "postinstall": "electron-rebuild",
     "postuninstall": "electron-rebuild",
     "script:translate": "scripts/runner.sh scripts/generateTranslations.ts",

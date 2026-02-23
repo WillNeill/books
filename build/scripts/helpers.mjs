@@ -23,7 +23,7 @@ export function getMainProcessCommonConfig(root) {
     plugins: [excludeVendorFromSourceMap],
     write: true,
     define: {
-      '__SENTRY_DSN__': JSON.stringify(process.env.SENTRY_DSN ?? ''),
+      __SENTRY_DSN__: JSON.stringify(process.env.SENTRY_DSN ?? ''),
     },
   };
 }

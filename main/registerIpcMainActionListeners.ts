@@ -168,7 +168,7 @@ export default function registerIpcMainActionListeners(main: Main) {
     async (_, code: string, allowNetwork = true) => {
       const obj = { languageMap: {}, success: true, message: '' };
       try {
-        obj.languageMap = await getLanguageMap(code, allowNetwork);
+        obj.languageMap = await getLanguageMap(code, Boolean(allowNetwork));
       } catch (err) {
         obj.success = false;
         obj.message = (err as Error).message;

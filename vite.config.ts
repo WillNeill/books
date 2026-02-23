@@ -23,9 +23,9 @@ export default () => {
     root: path.resolve(__dirname, './src'),
     plugins: [vue()],
     define: {
-      '__SENTRY_DSN__': JSON.stringify(process.env.SENTRY_DSN ?? ''),
-      '__POSTHOG_KEY__': JSON.stringify(process.env.POSTHOG_KEY ?? ''),
-      '__POSTHOG_HOST__': JSON.stringify(process.env.POSTHOG_HOST ?? ''),
+      __SENTRY_DSN__: JSON.stringify(process.env.SENTRY_DSN ?? ''),
+      __POSTHOG_KEY__: JSON.stringify(process.env.POSTHOG_KEY ?? ''),
+      __POSTHOG_HOST__: JSON.stringify(process.env.POSTHOG_HOST ?? ''),
     },
     resolve: {
       alias: {

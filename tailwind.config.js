@@ -16,8 +16,16 @@ module.exports = {
       // Dynamic color classes constructed at runtime in src/utils/colors.ts
       // (getBgColorClass, getColorClass, getTextColorClass, getBgTextColorClass)
       ...[
-        'gray', 'orange', 'green', 'red', 'yellow',
-        'blue', 'indigo', 'pink', 'purple', 'teal',
+        'gray',
+        'orange',
+        'green',
+        'red',
+        'yellow',
+        'blue',
+        'indigo',
+        'pink',
+        'purple',
+        'teal',
       ].flatMap((c) =>
         [100, 200, 300, 400, 500, 600, 700, 800, 900].flatMap((v) => [
           `bg-${c}-${v}`,

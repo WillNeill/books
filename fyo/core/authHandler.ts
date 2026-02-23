@@ -17,7 +17,7 @@ export class AuthHandler {
   #session: Session;
   fyo: Fyo;
 
-  constructor(fyo: Fyo, Demux?: AuthDemuxConstructor) {
+  constructor(fyo: Fyo, _Demux?: AuthDemuxConstructor) {
     this.fyo = fyo;
     this.#config = {
       serverURL: '',

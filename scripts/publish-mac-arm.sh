@@ -1,43 +1,60 @@
-# #! /bin/zsh
+#!/bin/zsh
 
 set -e
 
-# Check node and yarn versions
-YARN_VERSION=$(yarn --version)
-if [ "$YARN_VERSION" != "1.22.18" ]; then
-  echo "Incorrect yarn version: $YARN_VERSION"
+# ---------------------------------------------------------------------------
+# publish-mac-arm.sh — Build and publish a signed macOS ARM release
+#
+# Reads secrets from .env.publish (GH_TOKEN, APPLE_*, SENTRY_DSN, POSTHOG_*).
+# Clones a fresh shallow copy of the repo to guarantee a clean build, then
+# runs the electron-builder pipeline with code signing and notarization.
+# ---------------------------------------------------------------------------
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# Source secrets — must exist alongside the repo root
+if [ ! -f "$REPO_ROOT/.env.publish" ]; then
+  echo "Missing .env.publish — copy .env.example and fill in values."
   exit 1
 fi
+source "$REPO_ROOT/.env.publish"
 
-# Source secrets
-source .env.publish
+# Validate that critical env vars are set
+for var in GH_TOKEN APPLE_ID APPLE_TEAM_ID APPLE_APP_SPECIFIC_PASSWORD; do
+  if [ -z "${(P)var}" ]; then
+    echo "Required env var $var is not set in .env.publish"
+    exit 1
+  fi
+done
 
-# Create folder for the publish build
-cd ../
-rm -rf build_publish
-mkdir build_publish
-cd build_publish
+# Create a clean build directory next to the repo
+BUILD_DIR="$REPO_ROOT/../build_publish"
+rm -rf "$BUILD_DIR"
+mkdir -p "$BUILD_DIR"
 
-# Clone and cd into books
-git clone https://github.com/frappe/books --depth 1
-cd books
+# Clone the current branch at HEAD (shallow) for a clean build
+CURRENT_BRANCH=$(git -C "$REPO_ROOT" rev-parse --abbrev-ref HEAD)
+REMOTE_URL=$(git -C "$REPO_ROOT" remote get-url origin)
+echo "Cloning $REMOTE_URL ($CURRENT_BRANCH) into $BUILD_DIR/books..."
+git clone "$REMOTE_URL" --branch "$CURRENT_BRANCH" --depth 1 "$BUILD_DIR/books"
+cd "$BUILD_DIR/books"
 
-# Copy creds to log_creds.txt
-echo $ERR_LOG_KEY > log_creds.txt
-echo $ERR_LOG_SECRET >> log_creds.txt
-echo $ERR_LOG_URL >> log_creds.txt
-echo $TELEMETRY_URL >> log_creds.txt
-
-
-# Install Dependencies
+# Install dependencies
 yarn install
 
-# Set .env and build
-export GH_TOKEN=$GH_TOKEN &&
- export CSC_IDENTITY_AUTO_DISCOVERY=true &&
- export APPLE_ID=$APPLE_ID &&
- export APPLE_TEAM_ID=$APPLE_TEAM_ID &&
- export APPLE_APP_SPECIFIC_PASSWORD=$APPLE_APP_SPECIFIC_PASSWORD &&
- yarn build --mac --publish=always
+# Export env vars for electron-builder and the build script
+export GH_TOKEN
+export CSC_IDENTITY_AUTO_DISCOVERY=true
+export APPLE_ID
+export APPLE_TEAM_ID
+export APPLE_APP_SPECIFIC_PASSWORD
+export SENTRY_DSN
+export POSTHOG_KEY
+export POSTHOG_HOST
 
-cd ../books
+# Build and publish
+yarn build --mac --publish=always
+
+echo ""
+echo "Done — check GitHub Releases for the draft."
